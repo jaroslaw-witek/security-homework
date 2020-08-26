@@ -2,31 +2,33 @@ package jw.spring.training.securityexample;
 
 import jw.spring.training.securityexample.entity.AppRole;
 import jw.spring.training.securityexample.entity.AppUser;
+import jw.spring.training.securityexample.filter.JwtFilter;
 import jw.spring.training.securityexample.repository.AppRoleRepository;
 import jw.spring.training.securityexample.repository.AppUserRepository;
+import jw.spring.training.securityexample.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final AppUserRepository appUserRepository;
+//    private final AppUserRepository appUserRepository;
     private final AppRoleRepository appRoleRepository;
+    private final AppUserService appUserService;
 
     @Autowired
-    public SecConfiguration(AppUserRepository appUserRepository, AppRoleRepository appRoleRepository) {
-        this.appUserRepository = appUserRepository;
+    public SecConfiguration(AppRoleRepository appRoleRepository, AppUserService appUserService) {
         this.appRoleRepository = appRoleRepository;
+        this.appUserService = appUserService;
     }
+
 
     @Bean
     public PasswordEncoder getPasswordEncoder(){
@@ -35,29 +37,18 @@ public class SecConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        User user = new User("user1", getPasswordEncoder().encode("user1"), Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
-//        User admin = new User("admin1", "{noop}admin1", Arrays.asList(
-//                new SimpleGrantedAuthority("ROLE_USER"),
-//                new SimpleGrantedAuthority("ROLE_ADMIN")
-//        ));
 
-//        auth.inMemoryAuthentication()
-//                .withUser(user);
-//
-//        auth.inMemoryAuthentication()
-//                .withUser("admin1").password("{noop}admin1")
-//                .roles("ADMIN", "USER");
         populateRoles();
         populateUsers();
-
-        auth.userDetailsService(new UserDetailsService() {
-
-            @Override
-            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                AppUser appUser = appUserRepository.findByName(username);
-                return  appUser;
-            }
-        });
+        auth.userDetailsService(appUserService);
+//        auth.userDetailsService(new UserDetailsService() {
+//
+//            @Override
+//            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//                AppUser appUser = appUserRepository.findByName(username).get();
+//                return  appUser;
+//            }
+//        });
 
 
 
@@ -83,14 +74,14 @@ public class SecConfiguration extends WebSecurityConfigurerAdapter {
         appUser.setName("user2");
         appUser.setPassword(getPasswordEncoder().encode("user2"));
         appUser.addRole(appRoleRepository.findAppRoleByName("ROLE_USER").get());
-        appUserRepository.save(appUser);
+        appUserService.addAppUser(appUser);
 
         AppUser appUserAdmin = new AppUser();
         appUserAdmin.setName("admin2");
         appUserAdmin.setPassword(getPasswordEncoder().encode("admin2"));
         appUserAdmin.addRole(appRoleRepository.findAppRoleByName("ROLE_ADMIN").get());
         appUserAdmin.addRole(appRoleRepository.findAppRoleByName("ROLE_VIP").get());
-        appUserRepository.save(appUserAdmin);
+        appUserService.addAppUser(appUserAdmin);
     }
 
     @Override
@@ -101,9 +92,9 @@ public class SecConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/hello").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/vip/hello").hasRole("VIP")
                 .anyRequest().permitAll()
-//                .and().formLogin().loginPage("/login").permitAll() - wskazanie nie przygotowana, niedomyslna strone
                 .and().formLogin().permitAll()
-                .and().logout();
+                .and().logout()
+                .and().addFilterBefore(new JwtFilter(appUserService), UsernamePasswordAuthenticationFilter.class);;
 
     }
 }

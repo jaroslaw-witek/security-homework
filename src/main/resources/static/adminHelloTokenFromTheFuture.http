@@ -1,0 +1,4 @@
+GET http://localhost:9005/admin/hello
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImFkbWluMiIsImlhdCI6MTY2NjIzOTAyMiwiZXhwIjoxNjc2MjM5MDIzfQ.vcxUhVIxvKVaybQCoivGosmw8K-5fXYlKr_3_IS_5MA
+###
