@@ -1,0 +1,4 @@
+GET http://localhost:9005/vip/hello
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImFkbWluMiIsImlhdCI6MTU2NjIzOTAyMiwiZXhwIjoxNjc2MjM5MDIzfQ.gpSvk4V_ue_QdrIBaHbqtvGrcXMHQ-RLqdM-6HVDYwU
+###

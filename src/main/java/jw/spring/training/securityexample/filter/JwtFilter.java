@@ -10,6 +10,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jw.spring.training.securityexample.entity.AppUser;
 import jw.spring.training.securityexample.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
             decodedJWT = jwtVerifier.verify(bearerToken.substring(7));
         }catch (TokenExpiredException | InvalidClaimException ex){
             System.out.println(ex.getMessage());
-            httpServletResponse.sendError(401);
+            httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
             return;
         }
 

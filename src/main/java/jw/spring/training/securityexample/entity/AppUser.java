@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
+//@Table("app_users")
 public class AppUser implements UserDetails {
 
     @Id
@@ -20,8 +21,15 @@ public class AppUser implements UserDetails {
     private String password;
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
+    //    @OneToMany(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "role_id")
+//    private Set<AppRole> authorities;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "authorities_of_users",
+            joinColumns = @JoinColumn(name = "app_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Set<AppRole> authorities;
 
     public Long getId() {
@@ -44,8 +52,8 @@ public class AppUser implements UserDetails {
         this.name = name;
     }
 
-    public void addRole(AppRole appRole){
-        if(authorities == null) authorities = new HashSet<>();
+    public void addRole(AppRole appRole) {
+        if (authorities == null) authorities = new HashSet<>();
         authorities.add(appRole);
     }
 

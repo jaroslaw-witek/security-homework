@@ -1,17 +1,21 @@
 package jw.spring.training.securityexample.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
+//@Table("app_roles")
 public class AppRole {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(unique = true)
     private String name;
+
+    @ManyToMany(mappedBy = "authorities")
+    private Set<AppUser> users;
 
     public Long getId() {
         return id;

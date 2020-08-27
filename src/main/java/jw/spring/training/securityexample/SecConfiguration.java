@@ -4,7 +4,7 @@ import jw.spring.training.securityexample.entity.AppRole;
 import jw.spring.training.securityexample.entity.AppUser;
 import jw.spring.training.securityexample.filter.JwtFilter;
 import jw.spring.training.securityexample.repository.AppRoleRepository;
-import jw.spring.training.securityexample.repository.AppUserRepository;
+//import jw.spring.training.securityexample.repository.AppUserRepository;
 import jw.spring.training.securityexample.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -38,8 +38,8 @@ public class SecConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-        populateRoles();
-        populateUsers();
+//        populateRoles();
+//        populateUsers();
         auth.userDetailsService(appUserService);
 //        auth.userDetailsService(new UserDetailsService() {
 //
@@ -74,6 +74,7 @@ public class SecConfiguration extends WebSecurityConfigurerAdapter {
         appUser.setName("user2");
         appUser.setPassword(getPasswordEncoder().encode("user2"));
         appUser.addRole(appRoleRepository.findAppRoleByName("ROLE_USER").get());
+        appUser.addRole(appRoleRepository.findAppRoleByName("ROLE_VIP").get());
         appUserService.addAppUser(appUser);
 
         AppUser appUserAdmin = new AppUser();
